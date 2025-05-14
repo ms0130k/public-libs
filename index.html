@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
+  </head>
+  <body>
+    <canvas id="signature-canvas" style="border: 1px solid #000; width: 100%; height: 200px"></canvas>
+    <button id="clear">지우기</button>
+    <button id="save">저장</button>
+    <img id="preview" alt="서명 이미지 미리보기" style="margin-top: 10px" />
+    <script>
+      const canvas = document.getElementById('signature-canvas');
+      const signaturePad = new SignaturePad(canvas);
+
+      // 리사이즈 대응 (고해상도 처리)
+      function resizeCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+        signaturePad.clear(); // 사이즈 바꾸면 내용 사라짐
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas(); // 초기 사이즈 설정
+
+      // 지우기
+      document.getElementById('clear').addEventListener('click', () => {
+        signaturePad.clear();
+      });
+
+      // 저장 (Base64)
+      document.getElementById('save').addEventListener('click', () => {
+        if (signaturePad.isEmpty()) {
+          alert('서명해 주세요.');
+          return;
+        }
+        const dataUrl = signaturePad.toDataURL(); // base64 PNG
+        console.log(dataUrl); // base64 데이터 URL
+        console.log(dataUrl.substr(22, dataUrl.length)); // base64 데이터
+        // document.getElementById('preview').src = dataUrl.substr(22, dataUrl.length); // 미리보기
+
+        // 예: 서버로 전송 시
+        // fetch('/upload', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ image: dataUrl })
+        // });
+      });
+    </script>
+  </body>
+</html>
