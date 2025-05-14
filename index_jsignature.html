@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsignature@2.1.2/libs/jSignature.min.noconflict.js"></script>
+  </head>
+  <body>
+    <div id="signature"></div>
+    <button id="clear">지우기</button>
+    <button id="save">저장</button>
+    <img id="preview" alt="서명 미리보기" />
+    <script>
+      $(function () {
+        // 1. jSignature 초기화
+        $('#signature').jSignature({
+          width: 300,
+          height: 200,
+          color: '#000',
+          backgroundColor: '#fff',
+        });
+
+        // 2. 지우기
+        $('#clear').click(function () {
+          $('#signature').jSignature('reset');
+        });
+
+        // 3. 저장
+        $('#save').click(function () {
+          // base64 PNG 데이터 얻기
+          const dataPair = $('#signature').jSignature('getData', 'image');
+          const base64 = dataPair[1]; // [0]은 'image/png;base64'
+
+          // 미리보기용 이미지 생성
+          $('#preview').attr('src', 'data:image/png;base64,' + base64);
+
+          // 서버로 전송 예시 (POST, JSON 방식)
+          fetch('/api/upload-base64', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              imageDataUrl: 'data:image/png;base64,' + base64,
+            }),
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
